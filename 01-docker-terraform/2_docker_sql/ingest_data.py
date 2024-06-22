@@ -18,9 +18,11 @@ def main(params):
     db = params.db
     table_name = params.table_name
     url = params.url
-    csv_name = 'output.csv'
+    
+    # Extract the file name from the URL
+    csv_name = url.split("/")[-1]
 
-    # download the CSV file
+    # Download the CSV file
     os.system(f"wget {url} -O {csv_name}")
 
     engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
@@ -35,7 +37,6 @@ def main(params):
     df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace')
 
     df.to_sql(name=table_name, con=engine, if_exists='append')
-
 
     while True:
         try:
@@ -57,7 +58,7 @@ def main(params):
 
 
 if __name__ == '__main__':
-    # Parse the command line arguments and calls the main program
+    # Parse the command line arguments and call the main program
     parser = argparse.ArgumentParser(description='Ingest CSV data to Postgres')
 
     parser.add_argument('--user', help='user name for postgres')

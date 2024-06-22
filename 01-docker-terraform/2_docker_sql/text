@@ -1,3 +1,27 @@
+1. running postgres:
+(postgres already installed - using 5431 instead of 5432 port as the default port is occupied)
+docker run -it `
+>>     -e POSTGRES_USER="root" `
+>>     -e POSTGRES_PASSWORD="root" `
+>>     -e POSTGRES_DB="ny_taxi" `
+>>     -v ${PWD}/ny_taxi_postgres_data:/var/lib/postgresql/data `
+>>     -p 5431:5432 `
+>>     --network=pg-network `
+>>     --name pg-database `
+>>     postgres:13
+
+2. running pgadmin:
+docker run --rm -it `
+>>     -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" `
+>>     -e PGADMIN_DEFAULT_PASSWORD="root" `
+>>     -e PGADMIN_CONFIG_WTF_CSRF_ENABLED="False" `
+>>     -p "8080:80" `
+>>     --name pgadmin `
+>>     --network=pg-network `
+>>     dpage/pgadmin4:8.2
+
+------------------------
+
 url="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
 url="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet"
 python3.10 ingest_data.py \
@@ -7,3 +31,36 @@ python3.10 ingest_data.py \
     --port=5432 \
     --db=ny_taxi \
     --url=${url}
+
+python ingest_data.py \
+    --user=root \
+    --password=root \
+    --host=localhost \
+    --port=5432 \
+    --db=ny_taxi \
+    --url=${url}
+
+----------------------
+digi laptop: 
+
+docker run --rm -it \
+    -e PGADMIN_DEFAULT_EMAIL="admin@admin.com" \
+    -e PGADMIN_DEFAULT_PASSWORD="root" \
+    -e PGADMIN_CONFIG_WTF_CSRF_ENABLED="False" \
+    -p "8080:80" \
+    --name pgadmin \
+    --network=pg-network \
+    dpage/pgadmin4:8.2
+
+-----------------------
+docker build -t taxi_ingest:v001 .s
+docker run -it \
+    --network=pg-network \
+    taxi_ingest:v001 \
+    --user=root \
+    --password=root \
+    --host=pg-database \
+    --port=5432 \
+    --db=ny_taxi \
+    --table_name=yellow_taxi_trips \
+    --url="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"

@@ -1,3 +1,9 @@
-.ipynb_checkpoints/
-ny_taxi_postgres_data/
-*.csv
+1_terraform_azure/.terraform/
+1_terraform_azure/credentials/
+1_terraform_azure/.terraform.lock.*
+1_terraform_azure/terraform.tfstate
+
+2_docker_sql/.ipynb_checkpoints/
+2_docker_sql/ny_taxi_postgres_data/
+2_docker_sql/data_pgadmin/
+2_docker_sql/*.csv

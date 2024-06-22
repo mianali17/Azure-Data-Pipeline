@@ -1,0 +1,10 @@
+azure-storage-file-datalake
+apache-airflow-providers-databricks
+apache-airflow-providers-microsoft-azure
+feedparser
+pandas
+pyarrow
+python-dotenv
+sqlalchemy
+psycopg2-binary
+azure-storage-blob
