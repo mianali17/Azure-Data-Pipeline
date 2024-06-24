@@ -24,25 +24,25 @@ def format_to_parquet(src_file):
     if not src_file.endswith('.csv'):
         logging.error("Can only accept source files in CSV format, for the moment")
         return
-    try:
-        table = pv.read_csv(src_file)
-        logging.info(f"CSV rows read: {table.num_rows}")
-        pq.write_table(table, src_file.replace('.csv', '.parquet'))
-        parquet_table = pq.read_table(src_file.replace('.csv', '.parquet'))
-        logging.info(f"Parquet rows written: {parquet_table.num_rows}")
-    except Exception as e:
-        logging.error(f"Error during conversion: {e}")
-        raise
+    table = pv.read_csv(src_file)
+    pq.write_table(table, src_file.replace('.csv', '.parquet'))
+
+# def upload_to_azure(blob_service_client, container_name, object_name, local_file):
+#     blob_client = blob_service_client.get_blob_client(container=container_name, blob=object_name)
+
+#     chunk_size = 4 * 1024 * 1024  # 4 MB chunks
+
+#     with open(local_file, "rb") as data:
+#         for chunk in iter(lambda: data.read(chunk_size), b""):
+#             blob_client.upload_blob(chunk, blob_type=BlobType.AppendBlob, overwrite=True)
 
 
 def upload_to_azure(blob_service_client, container_name, object_name, local_file):
     blob_client = blob_service_client.get_blob_client(container=container_name, blob=object_name)
 
-    chunk_size = 4 * 1024 * 1024  # 4 MB chunks
-
     with open(local_file, "rb") as data:
-        for chunk in iter(lambda: data.read(chunk_size), b""):
-            blob_client.upload_blob(chunk, blob_type=BlobType.AppendBlob, overwrite=True)
+        blob_client.upload_blob(data, blob_type=BlobType.BlockBlob, overwrite=True)
+
 
 
 default_args = {
@@ -53,7 +53,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id="data_ingestion_azure_dag",
+    dag_id="data_ingestion_azure_dag_onefiletest",
     schedule_interval="@daily",
     default_args=default_args,
     catchup=False,
